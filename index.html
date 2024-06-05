@@ -1,15 +1,133 @@
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+        .status {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <div class="status" id="status"></div>
 
-    </head>
-    <body>
-        This is my very first website <b> By Lieon</b>  
-        
-        <a href="https://chaturbate.eu/carrielovex/" >
-        
-        <button style="font: size 25px; background-color: grey; color :lightblue ; border-radius: 25px;"> Fass mich and Bitte</button>
-    </a>
+    <script>
+        const board = document.getElementById('board');
+        const statusDiv = document.getElementById('status');
+        let cells = Array.from(document.getElementsByClassName('cell'));
+        let currentPlayer = 'X';
+        let gameActive = true;
+        let boardState = Array(9).fill(null);
 
-    </body>
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function handleCellClick(e) {
+            const index = e.target.getAttribute('data-index');
+            if (boardState[index] || !gameActive) {
+                return;
+            }
+            boardState[index] = currentPlayer;
+            e.target.innerText = currentPlayer;
+            checkResult();
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            updateStatus();
+        }
+
+        function checkResult() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+            if (roundWon) {
+                gameActive = false;
+                statusDiv.innerText = `Player ${currentPlayer} wins!`;
+                return;
+            }
+
+            let roundDraw = !boardState.includes(null);
+            if (roundDraw) {
+                gameActive = false;
+                statusDiv.innerText = 'Draw!';
+                return;
+            }
+        }
+
+        function updateStatus() {
+            if (gameActive) {
+                statusDiv.innerText = `Player ${currentPlayer}'s turn`;
+            }
+        }
+
+        function restartGame() {
+            currentPlayer = 'X';
+            gameActive = true;
+            boardState = Array(9).fill(null);
+            cells.forEach(cell => cell.innerText = '');
+            updateStatus();
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        updateStatus();
+    </script>
+</body>
 </html>
