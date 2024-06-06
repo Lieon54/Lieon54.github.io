@@ -3,42 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lieon's Tolles lauf spiel</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        #gameCanvas {
-            border: 1px solid #000;
-            margin-top: 20px;
-        }
-        .controls {
-            margin-top: 20px;
-        }
-        .controls button {
-            margin: 5px;
-            padding: 10px;
-        }
-        .status {
-            margin-top: 20px;
-        }
-    </style>
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>2D Bird Perspective Game</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="controls">
-        <button id="up">Up</button>
-        <button id="left">Left</button>
-        <button id="right">Right</button>
-        <button id="down">Down</button>
+    <h1>Tetris Game</h1>
+    <canvas id="gameCanvas" width="200" height="400"></canvas>
+    <div class="score">Score: <span id="score">0</span></div>
+    <div id="gameOver" style="display:none;">
+        <p>Game Over!</p>
+        <p>Your Score: <span id="finalScore">0</span></p>
+        <input type="text" id="playerName" placeholder="Enter your name">
+        <button id="saveScore">Save Score</button>
     </div>
-    <div class="status">
-        <p>Steps: <span id="stepsCount">0</span></p>
-    </div>
+    <h2>Leaderboard</h2>
+    <div id="leaderboard"></div>
     <script src="game.js"></script>
 </body>
 </html>
