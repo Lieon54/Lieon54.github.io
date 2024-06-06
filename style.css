@@ -8,9 +8,13 @@ canvas {
     border: 1px solid #000;
     margin-bottom: 10px;
 }
-.score, #gameOver, #leaderboard {
+.score, #gameOver, #leaderboard, .controls {
     margin: 10px 0;
 }
 input, button {
     margin-top: 10px;
+}
+.controls button {
+    margin: 5px;
+    padding: 10px;
 }
