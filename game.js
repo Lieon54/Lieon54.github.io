@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerNameInput = document.getElementById('playerName');
     const saveScoreButton = document.getElementById('saveScore');
     const leaderboardElement = document.getElementById('leaderboard');
-    
+
     const ROWS = 20;
     const COLS = 10;
     const SQ = 20;
@@ -207,12 +207,233 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return false;
+
+        // control the piece using buttons
+    document.getElementById('left').addEventListener('click', () => {
+        p.moveLeft();
+    });
+    
+    document.getElementById('right').addEventListener('click', () => {
+        p.moveRight();
+    });
+    
+    document.getElementById('rotate').addEventListener('click', () => {
+        p.rotate();
+    });
+    
+    document.getElementById('down').addEventListener('click', () => {
+        p.moveDown();
+    });
+
+    // drop the piece every 1 second
+    let dropStart = Date.now();
+    let gameOver = false;
+    function drop() {
+        let now = Date.now();
+        let delta = now - dropStart;
+        if (delta > 1000) {
+            p.moveDown();
+            dropStart = Date.now();
+        }
+        if (!gameOver) {
+            requestAnimationFrame(drop);
+        }
+    }
+    
+    drop();
+
+    // the tetrominoes shapes and colors
+    const I = [
+        [
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
+        [
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0]
+        ],
+        [
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
+        [
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0],
+            [0, 0, 1, 0]
+        ]
+    ];
+
+    const J = [
+        [
+            [1, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 1],
+            [0, 1, 0],
+            [0, 1, 0]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 0, 1]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 0],
+            [1, 1, 0]
+        ]
+    ];
+
+    const L = [
+        [
+            [0, 0, 1],
+            [1, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 0],
+            [0, 1, 1]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [1, 0, 0]
+        ],
+        [
+            [1, 1, 0],
+            [0, 1, 0],
+            [0, 1, 0]
+        ]
+    ];
+
+    const O = [
+        [
+            [0, 0, 0, 0],
+            [0, 1, 1, 0],
+            [0, 1, 1, 0],
+            [0, 0, 0, 0]
+        ]
+    ];
+
+    const S = [
+        [
+            [0, 1, 1],
+            [1, 1, 0],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 1],
+            [0, 0, 1]
+        ],
+        [
+            [0, 0, 0],
+            [0, 1, 1],
+            [1, 1, 0]
+        ],
+        [
+            [1, 0, 0],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
+    ];
+
+    const T = [
+        [
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 1, 0],
+            [0, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 1, 0],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
+    ];
+
+    const Z = [
+        [
+            [1, 1, 0],
+            [0, 1, 1],
+            [0, 0, 0]
+        ],
+        [
+            [0, 0, 1],
+            [0, 1, 1],
+            [0, 1, 0]
+        ],
+        [
+            [0, 0, 0],
+            [1, 1, 0],
+            [0, 1, 1]
+        ],
+        [
+            [0, 1, 0],
+            [1, 1, 0],
+            [1, 0, 0]
+        ]
+    ];
+
+    // save score and update leaderboard
+    saveScoreButton.addEventListener('click', () => {
+        const playerName = playerNameInput.value.trim();
+        if (playerName) {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            leaderboard.push({ name: playerName, score });
+            leaderboard.sort((a, b) => b.score - a.score);
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+            updateLeaderboard();
+            gameOverElement.style.display = 'none';
+            playerNameInput.value = '';
+            resetGame();
+        }
+    });
+
+    // update leaderboard
+    function updateLeaderboard() {
+        const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        leaderboardElement.innerHTML = leaderboard.map(entry => `<p>${entry.name}: ${entry.score}</p>`).join('');
     }
 
-    // control the piece
-    document.addEventListener('keydown', CONTROL);
+    // reset game
+    function resetGame() {
+        score = 0;
+        scoreElement.textContent = score;
+        board = [];
+        for (let r = 0; r < ROWS; r++) {
+            board[r] = [];
+            for (let c = 0; c < COLS; c++) {
+                board[r][c] = VACANT;
+            }
+        }
+        drawBoard();
+        p = randomPiece();
+        gameOver = false;
+        drop();
+    }
 
-    function CONTROL(event) {
-        if (event.keyCode == 37) {
-            p.moveLeft();
-        } else if (event.keyCode ==
+    updateLeaderboard();
+
+    let p = randomPiece();
+    drop();
+});
