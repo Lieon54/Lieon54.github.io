@@ -1,114 +1,44 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
+    <title>2D Bird Perspective Game</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
             font-family: Arial, sans-serif;
         }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            gap: 5px;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
+        #gameCanvas {
             border: 1px solid #000;
-            cursor: pointer;
+            margin-top: 20px;
         }
-        .cell:hover {
-            background-color: #f0f0f0;
+        .controls {
+            margin-top: 20px;
+        }
+        .controls button {
+            margin: 5px;
+            padding: 10px;
         }
         .status {
             margin-top: 20px;
-            font-size: 1.5rem;
         }
     </style>
 </head>
 <body>
-    <div>
-        <div class="board" id="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
-        </div>
-        <div class="status" id="status"></div>
+    <h1>2D Bird Perspective Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button id="up">Up</button>
+        <button id="left">Left</button>
+        <button id="right">Right</button>
+        <button id="down">Down</button>
     </div>
-    <script>
-        const board = document.getElementById('board');
-        const statusDisplay = document.getElementById('status');
-        let currentPlayer = 'X';
-        let gameState = ["", "", "", "", "", "", "", "", ""];
-
-        const winningConditions = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-
-        const handleCellClick = (event) => {
-            const clickedCell = event.target;
-            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-
-            if (gameState[clickedCellIndex] !== "" || !isGameActive()) {
-                return;
-            }
-
-            gameState[clickedCellIndex] = currentPlayer;
-            clickedCell.textContent = currentPlayer;
-            checkResult();
-        };
-
-        const isGameActive = () => {
-            return gameState.includes("");
-        };
-
-        const checkResult = () => {
-            let roundWon = false;
-            for (let i = 0; i < winningConditions.length; i++) {
-                const [a, b, c] = winningConditions[i];
-                if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
-                    roundWon = true;
-                    break;
-                }
-            }
-
-            if (roundWon) {
-                statusDisplay.textContent = `Spieler ${currentPlayer} hat gewonnen!`;
-                return;
-            }
-
-            if (!isGameActive()) {
-                statusDisplay.textContent = "Unentschieden!";
-                return;
-            }
-
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        };
-
-        board.addEventListener('click', handleCellClick);
-    </script>
+    <div class="status">
+        <p>Steps: <span id="stepsCount">0</span></p>
+    </div>
+    <script src="game.js"></script>
 </body>
 </html>
