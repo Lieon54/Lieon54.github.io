@@ -1,120 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Tic-Tac-Toe</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
             font-family: Arial, sans-serif;
         }
-        canvas {
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
             border: 1px solid #000;
-            background-color: #fff;
+            cursor: pointer;
+        }
+        .cell:hover {
+            background-color: #f0f0f0;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 1.5rem;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-
+    <div>
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="status" id="status"></div>
+    </div>
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const box = 20;
+        const board = document.getElementById('board');
+        const statusDisplay = document.getElementById('status');
+        let currentPlayer = 'X';
+        let gameState = ["", "", "", "", "", "", "", "", ""];
 
-        let snake = [];
-        snake[0] = {
-            x: 9 * box,
-            y: 10 * box
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const handleCellClick = (event) => {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameState[clickedCellIndex] !== "" || !isGameActive()) {
+                return;
+            }
+
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            checkResult();
         };
 
-        let food = {
-            x: Math.floor(Math.random() * 19 + 1) * box,
-            y: Math.floor(Math.random() * 19 + 1) * box
+        const isGameActive = () => {
+            return gameState.includes("");
         };
 
-        let score = 0;
-        let direction;
-
-        document.addEventListener('keydown', changeDirection);
-
-        function changeDirection(event) {
-            if (event.keyCode === 37 && direction !== 'RIGHT') {
-                direction = 'LEFT';
-            } else if (event.keyCode === 38 && direction !== 'DOWN') {
-                direction = 'UP';
-            } else if (event.keyCode === 39 && direction !== 'LEFT') {
-                direction = 'RIGHT';
-            } else if (event.keyCode === 40 && direction !== 'UP') {
-                direction = 'DOWN';
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = i === 0 ? 'green' : 'lightgreen';
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
-
-                ctx.strokeStyle = 'darkgreen';
-                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-            }
-
-            ctx.fillStyle = 'red';
-            ctx.fillRect(food.x, food.y, box, box);
-
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
-
-            if (direction === 'LEFT') snakeX -= box;
-            if (direction === 'UP') snakeY -= box;
-            if (direction === 'RIGHT') snakeX += box;
-            if (direction === 'DOWN') snakeY += box;
-
-            if (snakeX === food.x && snakeY === food.y) {
-                score++;
-                food = {
-                    x: Math.floor(Math.random() * 19 + 1) * box,
-                    y: Math.floor(Math.random() * 19 + 1) * box
-                };
-            } else {
-                snake.pop();
-            }
-
-            let newHead = {
-                x: snakeX,
-                y: snakeY
-            };
-
-            if (snakeX < 0 || snakeX >= 20 * box || snakeY < 0 || snakeY >= 20 * box || collision(newHead, snake)) {
-                clearInterval(game);
-                alert('Game Over');
-            }
-
-            snake.unshift(newHead);
-
-            ctx.fillStyle = 'black';
-            ctx.font = '45px Changa one';
-            ctx.fillText(score, 2 * box, 1.6 * box);
-        }
-
-        function collision(head, array) {
-            for (let i = 0; i < array.length; i++) {
-                if (head.x === array[i].x && head.y === array[i].y) {
-                    return true;
+        const checkResult = () => {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                    roundWon = true;
+                    break;
                 }
             }
-            return false;
-        }
 
-        let game = setInterval(draw, 100);
+            if (roundWon) {
+                statusDisplay.textContent = `Spieler ${currentPlayer} hat gewonnen!`;
+                return;
+            }
+
+            if (!isGameActive()) {
+                statusDisplay.textContent = "Unentschieden!";
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        };
+
+        board.addEventListener('click', handleCellClick);
     </script>
 </body>
 </html>
