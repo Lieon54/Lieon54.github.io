@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+canvas {
+    border: 1px solid #000;
+    background-color: #fff;
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+}
+
+.scoreboard {
+    margin-top: 20px;
+}
+
+#highScores {
+    list-style: none;
+    padding: 0;
+}
+
+#highScores li {
+    margin: 5px 0;
+}
