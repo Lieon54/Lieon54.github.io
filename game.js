@@ -1,82 +1,172 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreElement = document.getElementById('score');
-    const gameOverElement = document.getElementById('gameOver');
-    const finalScoreElement = document.getElementById('finalScore');
-    const playerNameInput = document.getElementById('playerName');
-    const saveScoreButton = document.getElementById('saveScore');
-    const leaderboardElement = document.getElementById('leaderboard');
+// Define Tetromino shapes and colors
+const I = [
+    [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ],
+    [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0]
+    ],
+    [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ],
+    [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0]
+    ]
+];
 
-    const ROWS = 20;
-    const COLS = 10;
-    const SQ = 20;
-    const VACANT = 'WHITE'; // color of an empty square
+const J = [
+    [
+        [1, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+    ],
+    [
+        [0, 1, 1],
+        [0, 1, 0],
+        [0, 1, 0]
+    ],
+    [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 1]
+    ],
+    [
+        [0, 1, 0],
+        [0, 1, 0],
+        [1, 1, 0]
+    ]
+];
 
-    // draw a square
-    function drawSquare(x, y, color) {
-        ctx.fillStyle = color;
-        ctx.fillRect(x * SQ, y * SQ, SQ, SQ);
+const L = [
+    [
+        [0, 0, 1],
+        [1, 1, 1],
+        [0, 0, 0]
+    ],
+    [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 1]
+    ],
+    [
+        [0, 0, 0],
+        [1, 1, 1],
+        [1, 0, 0]
+    ],
+    [
+        [1, 1, 0],
+        [0, 1, 0],
+        [0, 1, 0]
+    ]
+];
 
-        ctx.strokeStyle = 'BLACK';
-        ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
-    }
+const O = [
+    [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0]
+    ]
+];
 
-    // create the board
-    let board = [];
-    for (let r = 0; r < ROWS; r++) {
-        board[r] = [];
-        for (let c = 0; c < COLS; c++) {
-            board[r][c] = VACANT;
-        }
-    }
+const S = [
+    [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0]
+    ],
+    [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 1]
+    ],
+    [
+        [0, 0, 0],
+        [0, 1, 1],
+        [1, 1, 0]
+    ],
+    [
+        [1, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0]
+    ]
+];
 
-    // draw the board
-    function drawBoard() {
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                drawSquare(c, r, board[r][c]);
-            }
-        }
-    }
+const T = [
+    [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+    ],
+    [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 1, 0]
+    ],
+    [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+    ],
+    [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 1, 0]
+    ]
+];
 
-    drawBoard();
+const Z = [
+    [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0]
+    ],
+    [
+        [0, 0, 1],
+        [0, 1, 1],
+        [0, 1, 0]
+    ],
+    [
+        [0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 1]
+    ],
+    [
+        [0, 1, 0],
+        [1, 1, 0],
+        [1, 0, 0]
+    ]
+];
 
-    // the pieces and their colors
-    const PIECES = [
-        [Z, 'red'],
-        [S, 'green'],
-        [T, 'yellow'],
-        [O, 'blue'],
-        [L, 'purple'],
-        [I, 'cyan'],
-        [J, 'orange']
-    ];
-
-    // generate random pieces
-    function randomPiece() {
-        let r = randomN = Math.floor(Math.random() * PIECES.length); // 0 -> 6
-        return new Piece(PIECES[r][0], PIECES[r][1]);
-    }
-
-    // The Object Piece
-    function Piece(tetromino, color) {
+// Define a class for Tetromino pieces
+class Piece {
+    constructor(tetromino, color) {
         this.tetromino = tetromino;
         this.color = color;
 
-        this.tetrominoN = 0; // we start from the first pattern
-        this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.activeTetromino = this.tetromino[this.tetrominoN]; // Current active pattern
 
-        // we need to control the pieces
+        // Starting position
         this.x = 3;
         this.y = -2;
     }
 
-    // fill function
-    Piece.prototype.fill = function (color) {
+    // Fill the Tetromino with color
+    fill(color) {
         for (let r = 0; r < this.activeTetromino.length; r++) {
             for (let c = 0; c < this.activeTetromino.length; c++) {
-                // we draw only occupied squares
                 if (this.activeTetromino[r][c]) {
                     drawSquare(this.x + c, this.y + r, color);
                 }
@@ -84,31 +174,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // draw a piece to the board
-    Piece.prototype.draw = function () {
+    // Draw the Tetromino
+    draw() {
         this.fill(this.color);
     }
 
-    // undraw a piece
-    Piece.prototype.unDraw = function () {
+    // Clear the Tetromino
+    unDraw() {
         this.fill(VACANT);
     }
 
-    // move Down the piece
-    Piece.prototype.moveDown = function () {
+    // Move the Tetromino down
+    moveDown() {
         if (!this.collision(0, 1, this.activeTetromino)) {
             this.unDraw();
             this.y++;
             this.draw();
         } else {
-            // we lock the piece and generate a new one
             this.lock();
             p = randomPiece();
         }
     }
 
-    // move Right the piece
-    Piece.prototype.moveRight = function () {
+    // Move the Tetromino right
+    moveRight() {
         if (!this.collision(1, 0, this.activeTetromino)) {
             this.unDraw();
             this.x++;
@@ -116,8 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // move Left the piece
-    Piece.prototype.moveLeft = function () {
+    // Move the Tetromino left
+    moveLeft() {
         if (!this.collision(-1, 0, this.activeTetromino)) {
             this.unDraw();
             this.x--;
@@ -125,16 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // rotate the piece
-    Piece.prototype.rotate = function () {
+    // Rotate the Tetromino
+    rotate() {
         let nextPattern = this.tetromino[(this.tetrominoN + 1) % this.tetromino.length];
         let kick = 0;
 
         if (this.collision(0, 0, nextPattern)) {
             if (this.x > COLS / 2) {
-                kick = -1; // move the piece to the left
+                kick = -1;
             } else {
-                kick = 1; // move the piece to the right
+                kick = 1;
             }
         }
 
@@ -147,9 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let score = 0;
-
-    Piece.prototype.lock = function () {
+    // Lock the Tetromino in place
+    lock() {
         for (let r = 0; r < this.activeTetromino.length; r++) {
             for (let c = 0; c < this.activeTetromino.length; c++) {
                 if (!this.activeTetromino[r][c]) {
@@ -165,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Check for full rows and clear them
         for (let r = 0; r < ROWS; r++) {
             let isRowFull = true;
             for (let c = 0; c < COLS; c++) {
@@ -186,7 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreElement.textContent = score;
     }
 
-    Piece.prototype.collision = function (x, y, piece) {
+    // Check for collisions
+    collision(x, y, piece) {
         for (let r = 0; r < piece.length; r++) {
             for (let c = 0; c < piece.length; c++) {
                 if (!piece[r][c]) {
@@ -207,233 +297,64 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return false;
+    }
+}
 
-        // control the piece using buttons
-    document.getElementById('left').addEventListener('click', () => {
-        p.moveLeft();
-    });
-    
-    document.getElementById('right').addEventListener('click', () => {
-        p.moveRight();
-    });
-    
-    document.getElementById('rotate').addEventListener('click', () => {
-        p.rotate();
-    });
-    
-    document.getElementById('down').addEventListener('click', () => {
-        p.moveDown();
-    });
+// Function to generate a random Tetromino piece
+function randomPiece() {
+    let r = Math.floor(Math.random() * PIECES.length);
+    return new Piece(PIECES[r][0], PIECES[r][1]);
+}
 
-    // drop the piece every 1 second
-    let dropStart = Date.now();
-    let gameOver = false;
-    function drop() {
-        let now = Date.now();
-        let delta = now - dropStart;
-        if (delta > 1000) {
-            p.moveDown();
-            dropStart = Date.now();
-        }
-        if (!gameOver) {
-            requestAnimationFrame(drop);
+// Function to draw the game board
+function drawBoard() {
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            drawSquare(c, r, board[r][c]);
         }
     }
-    
-    drop();
+}
 
-    // the tetrominoes shapes and colors
-    const I = [
-        [
-            [0, 0, 0, 0],
-            [1, 1, 1, 1],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0]
-        ],
-        [
-            [0, 0, 1, 0],
-            [0, 0, 1, 0],
-            [0, 0, 1, 0],
-            [0, 0, 1, 0]
-        ],
-        [
-            [0, 0, 0, 0],
-            [1, 1, 1, 1],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0]
-        ],
-        [
-            [0, 0, 1, 0],
-            [0, 0, 1, 0],
-            [0, 0, 1, 0],
-            [0, 0, 1, 0]
-        ]
-    ];
+// Function to draw a square on the canvas
+function drawSquare(x, y, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * SQ, y * SQ, SQ, SQ);
 
-    const J = [
-        [
-            [1, 0, 0],
-            [1, 1, 1],
-            [0, 0, 0]
-        ],
-        [
-            [0, 1, 1],
-            [0, 1, 0],
-            [0, 1, 0]
-        ],
-        [
-            [0, 0, 0],
-            [1, 1, 1],
-            [0, 0, 1]
-        ],
-        [
-            [0, 1, 0],
-            [0, 1, 0],
-            [1, 1, 0]
-        ]
-    ];
+    ctx.strokeStyle = 'BLACK';
+    ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
+}
 
-    const L = [
-        [
-            [0, 0, 1],
-            [1, 1, 1],
-            [0, 0, 0]
-        ],
-        [
-            [0, 1, 0],
-            [0, 1, 0],
-            [0, 1, 1]
-        ],
-        [
-            [0, 0, 0],
-            [1, 1, 1],
-            [1, 0, 0]
-        ],
-        [
-            [1, 1, 0],
-            [0, 1, 0],
-            [0, 1, 0]
-        ]
-    ];
+// Define Tetris settings
+const ROWS = 20;
+const COLS = 10;
+const SQ = 20;
+const VACANT = 'WHITE';
 
-    const O = [
-        [
-            [0, 0, 0, 0],
-            [0, 1, 1, 0],
-            [0, 1, 1, 0],
-            [0, 0, 0, 0]
-        ]
-    ];
+// Define Tetromino shapes and colors
+const PIECES = [
+    [I, 'red'],
+    [J, 'green'],
+    [L, 'yellow'],
+    [O, 'blue'],
+    [S, 'purple'],
+    [T, 'cyan'],
+    [Z, 'orange']
+];
 
-    const S = [
-        [
-            [0, 1, 1],
-            [1, 1, 0],
-            [0, 0, 0]
-        ],
-        [
-            [0, 1, 0],
-            [0, 1, 1],
-            [0, 0, 1]
-        ],
-        [
-            [0, 0, 0],
-            [0, 1, 1],
-            [1, 1, 0]
-        ],
-        [
-            [1, 0, 0],
-            [1, 1, 0],
-            [0, 1, 0]
-        ]
-    ];
-
-    const T = [
-        [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 0, 0]
-        ],
-        [
-            [0, 1, 0],
-            [0, 1, 1],
-            [0, 1, 0]
-        ],
-        [
-            [0, 0, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ],
-        [
-            [0, 1, 0],
-            [1, 1, 0],
-            [0, 1, 0]
-        ]
-    ];
-
-    const Z = [
-        [
-            [1, 1, 0],
-            [0, 1, 1],
-            [0, 0, 0]
-        ],
-        [
-            [0, 0, 1],
-            [0, 1, 1],
-            [0, 1, 0]
-        ],
-        [
-            [0, 0, 0],
-            [1, 1, 0],
-            [0, 1, 1]
-        ],
-        [
-            [0, 1, 0],
-            [1, 1, 0],
-            [1, 0, 0]
-        ]
-    ];
-
-    // save score and update leaderboard
-    saveScoreButton.addEventListener('click', () => {
-        const playerName = playerNameInput.value.trim();
-        if (playerName) {
-            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-            leaderboard.push({ name: playerName, score });
-            leaderboard.sort((a, b) => b.score - a.score);
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-            updateLeaderboard();
-            gameOverElement.style.display = 'none';
-            playerNameInput.value = '';
-            resetGame();
-        }
-    });
-
-    // update leaderboard
-    function updateLeaderboard() {
-        const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-        leaderboardElement.innerHTML = leaderboard.map(entry => `<p>${entry.name}: ${entry.score}</p>`).join('');
+// Initialize the game board
+let board = [];
+for (let r = 0; r < ROWS; r++) {
+    board[r] = [];
+    for (let c = 0; c < COLS; c++) {
+        board[r][c] = VACANT;
     }
+}
 
-    // reset game
-    function resetGame() {
-        score = 0;
-        scoreElement.textContent = score;
-        board = [];
-        for (let r = 0; r < ROWS; r++) {
-            board[r] = [];
-            for (let c = 0; c < COLS; c++) {
-                board[r][c] = VACANT;
-            }
-        }
-        drawBoard();
-        p = randomPiece();
-        gameOver = false;
-        drop();
-    }
+// Initialize canvas and context
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-    updateLeaderboard();
-
-    let p = randomPiece();
-    drop();
-});
+// Initialize score and create a new Tetromino piece
+let score = 0;
+let p = randomPiece();
+drawBoard();
