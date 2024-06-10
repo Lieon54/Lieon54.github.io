@@ -3,44 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Chat</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        #chat-box {
-            width: 400px;
-            height: 300px;
-            border: 1px solid #ccc;
-            overflow-y: scroll;
-        }
-        #message-input {
-            width: 300px;
-        }
-    </style>
+    <title>Download Image Sorter</title>
 </head>
 <body>
-    <h1>Online Chat</h1>
-    <div id="chat-box"></div>
-    <input type="text" id="message-input" placeholder="Type your message...">
-    <button onclick="sendMessage()">Send</button>
+    <h1>Download Image Sorter</h1>
+    <button onclick="downloadFile()">Download</button>
 
     <script>
-        function sendMessage() {
-            var messageInput = document.getElementById("message-input");
-            var message = messageInput.value.trim();
-            if (message !== "") {
-                displayMessage("You: " + message);
-                messageInput.value = "";
-            }
-        }
-
-        function displayMessage(message) {
-            var chatBox = document.getElementById("chat-box");
-            var messageElement = document.createElement("div");
-            messageElement.textContent = message;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        function downloadFile() {
+            // Replace 'username' with your GitHub username and 'repository' with your repository name
+            var url = 'https://github.com/username/repository/raw/main/Image%20Sorter.jar';
+            var anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = 'Image Sorter.jar'; // Name of the file to be downloaded
+            anchor.click();
         }
     </script>
 </body>
