@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Image Sorter</title>
+    <title>Download JAR Files</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Download Image Sorter</h1>
-    <button onclick="downloadFile()">Download</button>
-    <h1>Download 2D game</h1>
-     <button onclick="downloadFile2()">Download</button>
-    <script>
-        function downloadFile() {
-            var url = 'https://lieon54.github.io/Image%20Sorter.jar';
-            var anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = 'Image Sorter.jar'; // Name of the file to be downloaded
-            anchor.click();
-        }
-        function downloadFile2() {
-            var url = 'https://lieon54.github.io/2DGame.jar';
-            var anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = '2DGame.jar'; // Name of the file to be downloaded
-            anchor.click();
-        }
-    </script>
+
+    <h1>Download JAR Files</h1>
+    <button onclick="window.location.href='path/to/your/Image Sorter.jar'">Download Image Sorter.jar</button>
+    <button onclick="window.location.href='path/to/your/2DGame.jar'">Download 2DGame.jar</button>
+
 </body>
 </html>
