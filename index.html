@@ -8,13 +8,21 @@
 <body>
     <h1>Download Image Sorter</h1>
     <button onclick="downloadFile()">Download</button>
-
+    <h1>Download 2D game</h1>
+     <button onclick="downloadFile2()">Download</button>
     <script>
         function downloadFile() {
             var url = 'https://lieon54.github.io/Image%20Sorter.jar';
             var anchor = document.createElement('a');
             anchor.href = url;
             anchor.download = 'Image Sorter.jar'; // Name of the file to be downloaded
+            anchor.click();
+        }
+        function downloadFile2() {
+            var url = 'https://lieon54.github.io/2DGame.jar';
+            var anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = '2DGame.jar'; // Name of the file to be downloaded
             anchor.click();
         }
     </script>
